@@ -1,6 +1,6 @@
-/* Author: Divya Manian, Paul Irish, et al 
+/* Author: Divya Manian, Paul Irish, et al  */
 
-*/
+/*global window, navigator, document, importScripts, jQuery, setTimeout, opera, classList, List */
 
 // el.innerText / el.textContent helper
 var text;
@@ -18,7 +18,7 @@ if (window.attachEvent) {
   addEvent = function (el, ev, cb, capture) { el.addEventListener(ev, cb, capture); };
 }
 
-// gtieX augments. so a search is matching .gtie8, 
+// gtieX augments. so a search is matching .gtie8,
 // need to match .gtie7 and .gtie6 too
 var ies = ['gtie6', 'gtie7', 'gtie8', 'gtie9', 'gtie10'];
 
@@ -42,14 +42,15 @@ var	search = document.getElementById('livesearch'),
   if(ieindex != -1){
     tagslist = tagslist.concat(ies.slice(ieindex + 1));
   }
-  tags.textContent = tagslist.join(' ');  
+  tags.textContent = tagslist.join(' ');
 });
 
 var listOptions = {
 		listClass: 'features',
 		valueNames: ['kind', 'status', 'name', 'tags']
 	},
-  featureList = new List('gfs', listOptions);
+  featureList = new List('gfs', listOptions),
+  noitemsNotification = document.querySelector('#noitems');
   search.onkeyup = updatesearch;
 
 function updatesearch() {
@@ -64,6 +65,13 @@ function updatesearch() {
         classList(searchresults[i]).add('expanded');
         searchresults[i].querySelectorAll('h2')[0].setAttribute("aria-expanded", "true");
     }
+
+    if (!document.querySelectorAll('.expanded').length) {
+      classList(noitemsNotification).remove('visuallyhidden');
+    } else {
+      classList(noitemsNotification).add('visuallyhidden');
+    }
+
   } else {
     searchurl.className = '';
     for (var i = 0, len = searchresults.length; i < len; i++) {
@@ -75,7 +83,7 @@ function updatesearch() {
 
 var expandfeatures = document.querySelectorAll('.features article header'),
     count = expandfeatures.length;
-    
+
 for(var i = 0; i < count; i++) {
 
   expandfeatures[i].onclick = function(e) {
@@ -87,12 +95,12 @@ for(var i = 0; i < count; i++) {
       h2.setAttribute("aria-expanded", h2.getAttribute("aria-expanded") == "false" ? "true" : "false");
   };
 
-  var h2 = expandfeatures[i].querySelectorAll('h2')[0];
-  h2.setAttribute("tabIndex","0");
-  h2.setAttribute("role","button");
-  h2.setAttribute("aria-expanded","false");
+  var h2elem = expandfeatures[i].querySelectorAll('h2')[0];
+  h2elem.setAttribute("tabIndex","0");
+  h2elem.setAttribute("role","button");
+  h2elem.setAttribute("aria-expanded","false");
 
-  h2.onkeydown = function(e) {
+  h2elem.onkeydown = function(e) {
     if(e.keyCode === 13 || e.keyCode === 32 ){
       e.preventDefault();
       e = e || window.event;
@@ -103,7 +111,7 @@ for(var i = 0; i < count; i++) {
     }
   };
 
-  h2.onclick = function(e) {
+  h2elem.onclick = function(e) {
     e = e || window.event;
     var node = e.target || e.srcElement;
     var grandParent = node.parentNode.parentNode;
@@ -118,7 +126,7 @@ var clicktags = document.querySelectorAll('.explore-features a');
 [].map.call(clicktags, function(tag) {
   tag.onclick = function(e) {
     showsearch(/#(.*)/.exec(tag.href)[1]);
-  };  
+  };
 });
 
 if(window.location.hash) {
@@ -153,3 +161,21 @@ moredetails.onclick = function(e) {
   classList(document.getElementById(/#(.*)/.exec(target.href)[1])).toggle('active');
   e.preventDefault && e.preventDefault();
 };
+
+var supports3DTransforms =  document.body.style['webkitPerspective'] !== undefined ||
+                            document.body.style['MozPerspective'] !== undefined;
+
+function linkify( selector ) {
+    if( supports3DTransforms ) {
+
+        var nodes = document.querySelectorAll( selector );
+
+        for( var i = 0, len = nodes.length; i < len; i++ ) {
+            var node = nodes[i];
+
+            node.innerHTML = '<span data-title="'+ node.text +'">' + node.innerHTML + '</span>';
+        };
+    }
+}
+
+linkify( 'a' );
